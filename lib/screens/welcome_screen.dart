@@ -1,3 +1,5 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:chatx/components/rounded_button.dart';
 import 'package:chatx/screens/login_screen.dart';
 import 'package:chatx/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
@@ -7,17 +9,17 @@ class WelcomeScreen extends StatefulWidget {
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
-mixin countFrames{
-  print('hi');
-}
-class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+
+//mixin countFrames {}
+
+class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin /*countFrames*/ {
   AnimationController controller;
   Animation animation;
   int frame = 1;
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(duration: Duration(milliseconds: 1100), vsync: this);
+    controller = AnimationController(duration: Duration(seconds: 1), vsync: this);
     //animation = CurvedAnimation(parent: controller, curve: Curves.decelerate);
     animation = ColorTween(begin: Colors.grey, end: Colors.white).animate(controller);
     controller.forward();
@@ -59,58 +61,38 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                   tag: '#login',
                   child: Container(
                     child: Image.asset('images/logo.png'),
-                    height: controller.value * 100, //controller.value, //60.0,
+                    height: 60.0, //controller.value * 50, //controller.value, //60.0,
                   ),
                 ),
-                Text(
-                  'chaX',
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
-                  ),
+                TypewriterAnimatedTextKit(
+                  totalRepeatCount: 4,
+                  repeatForever: true, //this will ignore [totalRepeatCount]
+                  pause: Duration(milliseconds: 1000),
+                  text: ["Let'Z Chat"],
+                  textStyle: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold),
+                  displayFullTextOnTap: true,
+                  stopPauseOnTap: true,
                 ),
               ],
             ),
             SizedBox(
               height: 48.0,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                elevation: 5.0,
-                color: Colors.lightBlueAccent,
-                borderRadius: BorderRadius.circular(30.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    //Go to login screen.
-                    Navigator.pushNamed(context, LoginScreen.id);
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Log In',
-                  ),
-                ),
-              ),
+            RoundedButton(
+              color: Colors.lightBlueAccent,
+              text: 'Log In',
+              onTap: () {
+                //Go to login screen.
+                Navigator.pushNamed(context, LoginScreen.id);
+              },
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(30.0),
-                elevation: 5.0,
-                child: MaterialButton(
-                  onPressed: () {
-                    //Go to registration screen.
-                    Navigator.pushNamed(context, RegistrationScreen.id);
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Register',
-                  ),
-                ),
-              ),
+            RoundedButton(
+              text: 'Register',
+              onTap: () {
+//Go to registration screen.
+                Navigator.pushNamed(context, RegistrationScreen.id);
+              },
+              color: Colors.blueAccent,
             ),
           ],
         ),
