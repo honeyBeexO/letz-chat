@@ -1,5 +1,7 @@
 import 'package:chatx/components/rounded_button.dart';
 import 'package:chatx/constants.dart';
+import 'package:chatx/screens/chat_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -9,6 +11,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String _email;
+  String _password;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               onChanged: (value) {
                 //Do something with the user input.
+                this._email = value;
               },
               keyboardType: TextInputType.emailAddress,
               textAlign: TextAlign.center,
@@ -43,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               onChanged: (value) {
                 //Do something with the user input.
+                this._password = value;
               },
               textAlign: TextAlign.center,
               obscureText: true,
@@ -54,11 +61,25 @@ class _LoginScreenState extends State<LoginScreen> {
             RoundedButton(
               color: Colors.lightBlueAccent,
               text: 'Log In',
-              onTap: () {},
+              onTap: () {
+                _login();
+              },
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _login() async {
+    try {
+      final authenticatedUser = await _auth.signInWithEmailAndPassword(email: _email, password: _password);
+      if (authenticatedUser != null) {
+        print('Login success: $authenticatedUser');
+        Navigator.pushNamed(context, ChatScreen.id);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
