@@ -85,10 +85,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (authenticatedUser != null) {
         print('Login success: $authenticatedUser');
         Navigator.pushNamed(context, ChatScreen.id);
+        setState(() {
+          _showSpinner = false;
+        });
       }
-      setState(() {
-        _showSpinner = false;
-      });
     } catch (e) {
       print(e);
     }
