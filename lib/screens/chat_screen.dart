@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final _fireStore = Firestore.instance;
+FirebaseUser _loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = '/chat';
@@ -14,7 +15,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
-  FirebaseUser _loggedInUser;
   String _messageText;
   //final _fireStore = Firestore.instance; //We moved to the global state
   final _messageTextController = TextEditingController();
@@ -68,9 +68,8 @@ class _ChatScreenState extends State<ChatScreen> {
               icon: Icon(Icons.close),
               onPressed: () {
                 //Implement logout functionality
-                this._getMessagesStream();
-                //_auth.signOut();
-                //Navigator.pop(context);
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
@@ -145,18 +144,22 @@ class MessagesStream extends StatelessWidget {
             ),
           );
         }
-        final messages = snapshot.data.documents;
+        final messages = snapshot.data.documents.reversed; //we should reverse it to make the latest message as last element
         List<MessageBubble> messageBubbles = [];
         for (var message in messages) {
           final _text = message.data['text'];
           final _sender = message.data['sender'];
-          final messageBubble = MessageBubble(sender: _sender, message: _text);
+          final messageBubble = MessageBubble(
+            sender: _sender,
+            message: _text,
+            isMe: _sender == _loggedInUser.email,
+          );
           messageBubbles.add(messageBubble);
         }
         return Expanded(
           child: ListView(
+            reverse: true, //to display the end of the list as the main thing
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-            scrollDirection: Axis.vertical,
             children: messageBubbles,
           ),
         ); //Column(children: messagesWidget);
@@ -168,15 +171,15 @@ class MessagesStream extends StatelessWidget {
 class MessageBubble extends StatelessWidget {
   final String sender;
   final String message;
-
-  MessageBubble({this.sender, this.message});
+  final bool isMe;
+  MessageBubble({this.sender, this.message, this.isMe});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: this.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
             this.sender,
@@ -184,8 +187,13 @@ class MessageBubble extends StatelessWidget {
           ),
           Material(
             elevation: 5.0,
-            borderRadius: BorderRadius.circular(30.0),
-            color: Colors.indigo.withOpacity(0.98),
+            borderRadius: BorderRadius.only(
+              topLeft: isMe ? Radius.circular(25.0) : Radius.zero,
+              bottomLeft: Radius.circular(25.0),
+              bottomRight: Radius.circular(25.0),
+              topRight: isMe ? Radius.zero : Radius.circular(25.0),
+            ),
+            color: isMe ? Colors.indigo.withOpacity(0.98) : Colors.purple,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               child: Text(
