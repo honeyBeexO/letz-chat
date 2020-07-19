@@ -16,8 +16,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
   FirebaseUser _loggedInUser;
   String _messageText;
-  //final _fireStore = Firestore.instance;
-  //final textFieldController =
+  //final _fireStore = Firestore.instance; //We moved to the global state
+  final _messageTextController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -90,6 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      controller: _messageTextController,
                       onChanged: (value) {
                         //Do something with the user input.
                         this._messageText = value;
@@ -99,6 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
+                      _messageTextController.clear();
                       //Implement send functionality.
                       _fireStore.collection('messages').add(
                         {
